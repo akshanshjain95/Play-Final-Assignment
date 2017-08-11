@@ -1,0 +1,12 @@
+@(loginForm: Form[Login])(implicit messages: Messages)
+
+@import helper._
+
+@main("Login Form!") {
+
+@helper.form(action = routes.LoginController.loginPost){
+@helper.inputText(loginForm("username"), '_showConstraints -> false, '_label -> "Username")
+@helper.inputPassword(loginForm("password"), '_showConstraints -> false, '_label -> "Password")
+<button type="submit">Login</button>
+}
+}

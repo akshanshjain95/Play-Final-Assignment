@@ -1,0 +1,19 @@
+@(userForm: Form[SignUp])(implicit messages: Messages)
+
+@import helper._
+
+@main("Signup Form!") {
+
+@helper.form(action = routes.SignUpController.signUpPost) {
+@helper.inputText(userForm("firstName"), '_showConstraints -> false, '_label -> "First Name")
+@helper.inputText(userForm("middleName"), '_showConstraints -> false, '_label -> "Middle Name")
+@helper.inputText(userForm("lastName"), '_showConstraints -> false, '_label -> "Last Name")
+@helper.inputText(userForm("mobileNo"), '_showConstraints -> false, '_label -> "Mobile Number")
+@helper.inputText(userForm("username"), '_showConstraints -> false, '_label -> "Username")
+@helper.inputPassword(userForm("password"), '_showConstraints -> false, '_label -> "Password")
+@helper.inputPassword(userForm("repassword"), '_showConstraints -> false, '_label -> "Re-enter Password")
+@helper.select(userForm("gender"), options(List("Male", "Female")), '_multiple -> Some, '_showConstraints -> false, '_label -> "Gender")
+@helper.inputText(userForm("age"), '_showConstraints -> false, '_label -> "Age")
+<button type="submit">SignUp</button>
+}
+}

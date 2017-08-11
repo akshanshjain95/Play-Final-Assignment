@@ -1,0 +1,19 @@
+@(signUp: SignUp)
+
+@main("SignUp information"){
+
+<h1>With the following data, you have successfully signed up - </h1>
+
+<ul>
+    <li>First Name - @signUp.firstName</li>
+    @if(signUp.middleName != None){
+    <li>Middle Name - @signUp.middleName</li>}
+    <li>Last Name - @signUp.lastName</li>
+    <li>Mobile Number - @signUp.mobileNo</li>
+    <li>Username - @signUp.username</li>
+    <li>Password - @signUp.password</li>
+    <li>Gender - @signUp.gender</li>
+    <li>Age - @signUp.age</li>
+</ul>
+
+}
