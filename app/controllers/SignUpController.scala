@@ -35,29 +35,30 @@ class SignUpController @Inject()(userRepository: UserRepository, hobbyRepository
         Logger.info("Hobbies = " + signUpData.hobbies)
         val hashPassword = BCrypt.hashpw(signUpData.password, BCrypt.gensalt())
         val userData: User = User(0, signUpData.name.firstName, signUpData.name.middleName, signUpData.name.lastName,
-          signUpData.mobileNo, signUpData.email, signUpData.username, hashPassword,
+          signUpData.mobileNo, signUpData.email, hashPassword,
           signUpData.gender, signUpData.age, false, true)
         userRepository.checkEmail(userData.email).flatMap {
           case true =>
-            userRepository.checkUsername(userData.username).flatMap {
-              case true =>
                 Logger.info("userData = " + userData)
                 userRepository.addUser(userData).flatMap {
                   case true =>
                     val hobbyIDs: Future[List[List[Int]]] = hobbyRepository.getHobbyIDs(signUpData.hobbies)
                     hobbyIDs.flatMap(
-                      listOfHobbyIds => userHobbyRepository.addUserHobby(userData.email, listOfHobbyIds).map {
-                        case true => Ok(views.html.userProfile(signUpData)).withSession("email" -> s"${userData.email}")
-                        case false => Redirect(routes.SignUpController.signUp)
+                      listOfHobbyIds =>
+                      userRepository.getUserID(userData.email).flatMap {
+                        case Nil => Future.successful(Redirect(routes.SignUpController.signUp))
+                        case id: List[Int] =>
+                          userHobbyRepository.addUserHobby(id.head, listOfHobbyIds).map {
+                            case true => Redirect(routes.UpdateProfileController.showProfile).withSession("userID" -> s"${id.head}")
+                            case false => Redirect(routes.SignUpController.signUp)
+                          }
                       }
                     )
                   case false => Future.successful(Redirect(routes.SignUpController.signUp))
                 }
-              case false => Future.successful(Redirect(routes.SignUpController.signUp))
-            }
           case false => Future.successful(Redirect(routes.SignUpController.signUp))
+            }
         }
-      }
     )
   }
 

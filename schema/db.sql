@@ -5,7 +5,6 @@ CREATE TABLE IF NOT EXISTS "usertable" (
  lastName VARCHAR(10) NOT NULL,
  mobileNo BIGINT NOT NULL,
  email VARCHAR(30) NOT NULL,
- username VARCHAR(30) NOT NULL,
  password VARCHAR(65) NOT NULL,
  gender VARCHAR(10) NOT NULL,
  age INT NOT NULL,
@@ -22,7 +21,7 @@ PRIMARY KEY(id)
 
 CREATE TABLE IF NOT EXISTS usertohobbyid (
 id serial NOT NULL,
-email VARCHAR(30) NOT NULL,
+userid INT NOT NULL,
 hobby_id INT NOT NULL,
 PRIMARY KEY(id)
 );

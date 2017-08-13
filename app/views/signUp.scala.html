@@ -19,7 +19,6 @@
 @helper.inputText(userForm("name.lastName"), '_showConstraints -> false, '_label -> "Last Name")
 @helper.inputText(userForm("mobileNo"), '_showConstraints -> false, '_label -> "Mobile Number")
 @helper.inputText(userForm("email"), '_showConstraints -> false, '_label -> "E-Mail")
-@helper.inputText(userForm("username"), '_showConstraints -> false, '_label -> "Username")
 @helper.inputPassword(userForm("password"), '_showConstraints -> false, '_label -> "Password")
 @helper.inputPassword(userForm("repassword"), '_showConstraints -> false, '_label -> "Re-enter Password")
 @helper.select(userForm("gender"), options(List("Male", "Female")), '_showConstraints -> false, '_label -> "Gender")
@@ -28,7 +27,7 @@
 userForm("hobbies"),
 options = hobbyList.map(hobby => hobby -> hobby),
 '_label -> "Hobbies",
-'_error -> userForm("hobbies").error.map(_.withMessage("select one or more hobbies")))
+'_error -> userForm("hobbies").error.map(_.withMessage("Select atleast one hobby!")))
 <button type="submit">SignUp</button>
 }
 }

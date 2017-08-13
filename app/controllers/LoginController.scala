@@ -24,12 +24,16 @@ class LoginController @Inject()(userRepository: UserRepository, allForms: AllFor
         Future.successful(BadRequest(views.html.login(formWithErrors)))
       },
       userData => {
-        userRepository.checkIfUserExists(userData.username, userData.password).map {
+        userRepository.checkIfUserExists(userData.email, userData.password).flatMap {
           case true => {
-            val email = userRepository.getEmail(userData.username)
-            Ok(views.html.userProfile(userData)).withSession("email" -> s"$email")
+            Logger.info("User exists!")
+            userRepository.getUserID(userData.email).map {
+              case Nil => Ok(views.html.index())
+              case id: List[Int] =>
+                Redirect(routes.UpdateProfileController.showProfile).withSession("userID" -> s"${id.head}")
+            }
           }
-          case false => Redirect(routes.LoginController.login)
+          case false => Future.successful(Redirect(routes.LoginController.login))
         }
       })
   }

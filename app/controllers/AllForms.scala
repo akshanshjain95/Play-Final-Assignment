@@ -5,14 +5,14 @@ import play.api.data.Forms._
 import play.api.data.validation.{Constraint, Invalid, Valid, ValidationError}
 import scala.util.matching.Regex
 
-case class Login(username: String, password: String)
+case class Login(email: String, password: String)
 
-case class SignUp(name: Name, mobileNo: Long, email: String, username: String, password: String,
+case class SignUp(name: Name, mobileNo: Long, email: String, password: String,
                   repassword: String, gender: String, age: Int, hobbies: List[String])
 
 case class Name(firstName: String, middleName: Option[String], lastName: String)
 
-case class UpdateUserForm(name: Name, mobileNo: Long, email: String, username: String,
+case class UpdateUserForm(name: Name, mobileNo: Long, email: String,
                           gender: String, age: Int, hobbies: List[String])
 
 class AllForms {
@@ -28,12 +28,11 @@ class AllForms {
     )(Name.apply)(Name.unapply),
     "mobileNo" -> longNumber.verifying(numberOfDigits),
     "email" -> email,
-    "username" -> nonEmptyText,
     "password" -> nonEmptyText.verifying(checkPassword),
     "repassword" -> nonEmptyText.verifying(checkPassword),
     "gender" -> nonEmptyText,
     "age" -> number(MIN_AGE, MAX_AGE),
-    "hobbies" -> list(text)
+    "hobbies" -> list(nonEmptyText).verifying(nonEmptyList)
   )(SignUp.apply)(SignUp.unapply)
     .verifying(
       "The passwords did not match!",
@@ -41,7 +40,7 @@ class AllForms {
     ))
 
   val loginForm = Form(mapping(
-    "username" -> nonEmptyText,
+    "email" -> email,
     "password" -> nonEmptyText.verifying(checkPassword)
   )(Login.apply)(Login.unapply))
 
@@ -53,7 +52,6 @@ class AllForms {
     )(Name.apply)(Name.unapply),
     "mobileNo" -> longNumber.verifying(numberOfDigits),
     "email" -> email,
-    "username" -> nonEmptyText,
     "gender" -> nonEmptyText,
     "age" -> number(MIN_AGE, MAX_AGE),
     "hobbies" -> list(text)
@@ -103,6 +101,15 @@ class AllForms {
             case allLetters() => Valid
             case _ => Invalid(ValidationError("Name must only contain letters!"))
           }
+      }
+    )
+  }
+
+  def nonEmptyList: Constraint[List[String]] = {
+    Constraint("checkList.constraint")(
+      {
+        hobbies =>
+          if(hobbies.isEmpty) Invalid(ValidationError("Select atleast one hobby!")) else Valid
       }
     )
   }

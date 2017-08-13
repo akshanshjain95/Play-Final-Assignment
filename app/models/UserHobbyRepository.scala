@@ -9,7 +9,7 @@ import slick.lifted.{MappedProjection, ProvenShape, QueryBase}
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-case class UserToHobby(id: Int, email: String, hobbyID: Int)
+case class UserToHobby(id: Int, userID: Int, hobbyID: Int)
 
 trait UserHobbyRepositoryTable extends HasDatabaseConfigProvider[JdbcProfile] {
 
@@ -21,11 +21,11 @@ trait UserHobbyRepositoryTable extends HasDatabaseConfigProvider[JdbcProfile] {
 
     def id: Rep[Int] = column[Int]("id", O.AutoInc, O.PrimaryKey)
 
-    def email: Rep[String] = column[String]("email")
+    def userID: Rep[Int] = column[Int]("userid")
 
     def hobbyID: Rep[Int] = column[Int]("hobby_id")
 
-    def * : ProvenShape[UserToHobby] = (id, email, hobbyID) <> (UserToHobby.tupled, UserToHobby.unapply)
+    def * : ProvenShape[UserToHobby] = (id, userID, hobbyID) <> (UserToHobby.tupled, UserToHobby.unapply)
 
   }
 
@@ -35,11 +35,11 @@ class UserHobbyRepository @Inject()(protected val dbConfigProvider: DatabaseConf
 
   import driver.api._
 
-  def addUserHobby(email: String, hobbies: List[List[Int]]): Future[Boolean] = {
+  def addUserHobby(userID: Int, hobbies: List[List[Int]]): Future[Boolean] = {
     Logger.info("Adding hobbies for given user")
     val listOfValidHobbies = hobbies.filter(_ != Nil)
     val listOfResult: List[Future[Boolean]] = listOfValidHobbies.map (
-      hobbyID => db.run(userHobbyQuery += UserToHobby(0, email, hobbyID.head)).map(_ > 0)
+      hobbyID => db.run(userHobbyQuery += UserToHobby(0, userID, hobbyID.head)).map(_ > 0)
       )
     Future.sequence(listOfResult).map {
       result =>
@@ -47,10 +47,16 @@ class UserHobbyRepository @Inject()(protected val dbConfigProvider: DatabaseConf
     }
   }
 
-  def getUserHobby(email: String) = {
-    val innerJoin: QueryBase[Seq[(String, String)]] = for{
-      (user,hobbyName) <- userHobbyQuery join hobbyQuery
-    } yield (user.email, hobbyName.hobby)
+  def getUserHobby(userID: Int): Future[Seq[String]] = {
+    Logger.info("Retrieving user hobbies using user email")
+    val emailHobbyJoin: QueryBase[Seq[(Int, String)]] = for{
+      (user,hobbyName) <- userHobbyQuery join hobbyQuery on (_.hobbyID === _.id)
+    } yield (user.userID, hobbyName.hobby)
+
+    val emailHobbySeq: Future[Seq[(Int, String)]] = db.run(emailHobbyJoin.result)
+
+    emailHobbySeq.map(emailHobby => emailHobby.filter(_._1 == userID).map(_._2).toList)
+
   }
 
 }
