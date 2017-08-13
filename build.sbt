@@ -20,6 +20,11 @@ libraryDependencies += "org.mindrot" % "jbcrypt" % "0.4"
 
 libraryDependencies += "org.mockito" % "mockito-core" % "2.8.47" % "test"
 
+libraryDependencies += "com.h2database" % "h2" % "1.4.188"
+
+libraryDependencies += evolutions
+
+javaOptions in Test += "-Dconfig.file=conf/test.conf"
 
 // Adds additional packages into Twirl
 //TwirlKeys.templateImports += "com.example.controllers._"

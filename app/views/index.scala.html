@@ -1,5 +1,15 @@
 @()
 
+@import helper._
+
 @main("Welcome to Play") {
-  <h1>Welcome to Play!</h1>
+  <h1>Welcome!</h1>
+
+@form(action = routes.LoginController.login) {
+<button type="submit">Login</button>
+}
+
+@form(action = routes.SignUpController.signUp) {
+<button type="submit">SignUp</button>
+}
 }

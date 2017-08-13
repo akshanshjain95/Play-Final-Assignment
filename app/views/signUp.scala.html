@@ -1,19 +1,34 @@
-@(userForm: Form[SignUp])(implicit messages: Messages)
+@(userForm: Form[SignUp], hobbyList: List[String])(implicit messages: Messages)
+
 
 @import helper._
 
 @main("Signup Form!") {
 
+@if(userForm.hasGlobalErrors) {
+<ul>
+    @for(error <- userForm.globalErrors) {
+    <li>@Messages(error.messages, error.args)</li>
+    }
+</ul>
+}
+
 @helper.form(action = routes.SignUpController.signUpPost) {
-@helper.inputText(userForm("firstName"), '_showConstraints -> false, '_label -> "First Name")
-@helper.inputText(userForm("middleName"), '_showConstraints -> false, '_label -> "Middle Name")
-@helper.inputText(userForm("lastName"), '_showConstraints -> false, '_label -> "Last Name")
+@helper.inputText(userForm("name.firstName"), '_showConstraints -> false, '_label -> "First Name")
+@helper.inputText(userForm("name.middleName"), '_showConstraints -> false, '_label -> "Middle Name")
+@helper.inputText(userForm("name.lastName"), '_showConstraints -> false, '_label -> "Last Name")
 @helper.inputText(userForm("mobileNo"), '_showConstraints -> false, '_label -> "Mobile Number")
+@helper.inputText(userForm("email"), '_showConstraints -> false, '_label -> "E-Mail")
 @helper.inputText(userForm("username"), '_showConstraints -> false, '_label -> "Username")
 @helper.inputPassword(userForm("password"), '_showConstraints -> false, '_label -> "Password")
 @helper.inputPassword(userForm("repassword"), '_showConstraints -> false, '_label -> "Re-enter Password")
-@helper.select(userForm("gender"), options(List("Male", "Female")), '_multiple -> Some, '_showConstraints -> false, '_label -> "Gender")
+@helper.select(userForm("gender"), options(List("Male", "Female")), '_showConstraints -> false, '_label -> "Gender")
 @helper.inputText(userForm("age"), '_showConstraints -> false, '_label -> "Age")
+@inputCheckboxGroup(
+userForm("hobbies"),
+options = hobbyList.map(hobby => hobby -> hobby),
+'_label -> "Hobbies",
+'_error -> userForm("hobbies").error.map(_.withMessage("select one or more hobbies")))
 <button type="submit">SignUp</button>
 }
 }

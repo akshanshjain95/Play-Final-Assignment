@@ -7,22 +7,33 @@ import scala.util.matching.Regex
 
 case class Login(username: String, password: String)
 
-case class SignUp(firstName: String, middleName: Option[String], lastName: String,
-                  mobileNo: Long, username: String, password: String, repassword: String,
-                  gender: String, age: Int)
+case class SignUp(name: Name, mobileNo: Long, email: String, username: String, password: String,
+                  repassword: String, gender: String, age: Int, hobbies: List[String])
+
+case class Name(firstName: String, middleName: Option[String], lastName: String)
+
+case class UpdateUserForm(name: Name, mobileNo: Long, email: String, username: String,
+                          gender: String, age: Int, hobbies: List[String])
 
 class AllForms {
 
+  val MAX_AGE = 75
+  val MIN_AGE = 18
+
   val signUpForm = Form(mapping(
-    "firstName" -> nonEmptyText,
-    "middleName" -> optional(text),
-    "lastName" -> nonEmptyText,
+    "name" -> mapping(
+      "firstName" -> nonEmptyText.verifying(checkName),
+      "middleName" -> optional(text).verifying(checkMiddleName),
+      "lastName" -> nonEmptyText.verifying(checkName)
+    )(Name.apply)(Name.unapply),
     "mobileNo" -> longNumber.verifying(numberOfDigits),
+    "email" -> email,
     "username" -> nonEmptyText,
     "password" -> nonEmptyText.verifying(checkPassword),
     "repassword" -> nonEmptyText.verifying(checkPassword),
     "gender" -> nonEmptyText,
-    "age" -> number(18, 75)
+    "age" -> number(MIN_AGE, MAX_AGE),
+    "hobbies" -> list(text)
   )(SignUp.apply)(SignUp.unapply)
     .verifying(
       "The passwords did not match!",
@@ -33,6 +44,20 @@ class AllForms {
     "username" -> nonEmptyText,
     "password" -> nonEmptyText.verifying(checkPassword)
   )(Login.apply)(Login.unapply))
+
+  val updateUserForm = Form(mapping(
+    "name" -> mapping(
+      "firstName" -> nonEmptyText.verifying(checkName),
+      "middleName" -> optional(text).verifying(checkMiddleName),
+      "lastName" -> nonEmptyText.verifying(checkName)
+    )(Name.apply)(Name.unapply),
+    "mobileNo" -> longNumber.verifying(numberOfDigits),
+    "email" -> email,
+    "username" -> nonEmptyText,
+    "gender" -> nonEmptyText,
+    "age" -> number(MIN_AGE, MAX_AGE),
+    "hobbies" -> list(text)
+  )(UpdateUserForm.apply)(UpdateUserForm.unapply))
 
   def checkPassword: Constraint[String] = {
     Constraint("checkPassword.constraint")(
@@ -55,6 +80,31 @@ class AllForms {
           case _ => Valid
         }
       })
+  }
+
+  def checkName: Constraint[String] = {
+    Constraint("checkName.constraint")(
+      {
+        {
+          case allLetters() => Valid
+          case _ => Invalid(ValidationError("Name must only contain letters!"))
+        }
+      }
+    )
+  }
+
+  def checkMiddleName: Constraint[Option[String]] = {
+    Constraint("checkName.constraint")(
+      {
+        middleNameOption =>
+          val middleName = middleNameOption.fold("None")(identity)
+          middleName match {
+            case "None" => Valid
+            case allLetters() => Valid
+            case _ => Invalid(ValidationError("Name must only contain letters!"))
+          }
+      }
+    )
   }
 
   val allNumbers: Regex = """\d*""".r

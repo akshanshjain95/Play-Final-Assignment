@@ -1,17 +1,17 @@
 package models
 
 import com.google.inject.Inject
+import org.mindrot.jbcrypt.BCrypt
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.db.slick.{DatabaseConfigProvider, HasDatabaseConfigProvider}
 import slick.driver.JdbcProfile
 import slick.lifted.ProvenShape
 import play.api.Logger
-
 import scala.concurrent.Future
 
 case class User(id: Int, firstName: String, middleName: Option[String], lastName: String,
-                mobileNo: Long, username: String, password: String,
-                gender: String, age: Int)
+                mobileNo: Long, email: String, username: String, password: String,
+                gender: String, age: Int, isAdmin: Boolean, isEnabled: Boolean)
 
 trait UserRepositoryTable extends HasDatabaseConfigProvider[JdbcProfile] {
 
@@ -21,7 +21,7 @@ trait UserRepositoryTable extends HasDatabaseConfigProvider[JdbcProfile] {
 
   class UserTable(tag: Tag) extends Table[User](tag, "usertable") {
 
-    def id: Rep[Int] = column[Int]("id", O.AutoInc)
+    def id: Rep[Int] = column[Int]("id", O.AutoInc, O.PrimaryKey)
 
     def firstName: Rep[String] = column[String]("firstname")
 
@@ -31,7 +31,9 @@ trait UserRepositoryTable extends HasDatabaseConfigProvider[JdbcProfile] {
 
     def mobileNo: Rep[Long] = column[Long]("mobileno")
 
-    def username: Rep[String] = column[String]("username", O.PrimaryKey)
+    def email: Rep[String] = column[String]("email")
+
+    def username: Rep[String] = column[String]("username")
 
     def password: Rep[String] = column[String]("password")
 
@@ -39,7 +41,11 @@ trait UserRepositoryTable extends HasDatabaseConfigProvider[JdbcProfile] {
 
     def age: Rep[Int] = column[Int]("age")
 
-    def * : ProvenShape[User] = (id, firstName, middleName, lastName, mobileNo, username, password, gender, age) <> (User.tupled, User.unapply)
+    def isAdmin: Rep[Boolean] = column[Boolean]("isadmin")
+
+    def isEnabled: Rep[Boolean] = column[Boolean]("isenabled")
+
+    def * : ProvenShape[User] = (id, firstName, middleName, lastName, mobileNo, email, username, password, gender, age, isAdmin, isEnabled) <> (User.tupled, User.unapply)
 
   }
 
@@ -51,15 +57,50 @@ class UserRepository @Inject()(protected val dbConfigProvider: DatabaseConfigPro
 
   def addUser(user: User): Future[Boolean] = {
     Logger.info("Adding user to database")
-    db.run(userQuery += user) map (_>0)
+    db.run(userQuery += user) map (_ > 0)
   }
 
   def checkUsername(username: String): Future[Boolean] = {
     Logger.info("Checking if username exists in Database")
     val userList = db.run(userQuery.filter(_.username === username).to[List].result)
     userList.map { user =>
-      if(user.isEmpty) true else false
+      if (user.isEmpty) true else false
     }
+  }
+
+  def checkEmail(email: String): Future[Boolean] = {
+    Logger.info("Checking if email exists in Database")
+    val emailList = db.run(userQuery.filter(_.email === email).to[List].result)
+    emailList.map { email =>
+      if (email.isEmpty) true else false
+    }
+  }
+
+  def checkIfUserExists(username: String, password: String): Future[Boolean] = {
+    Logger.info("Checking if user exists in Database")
+    val userList = db.run(userQuery.filter(_.username === username).to[List].result)
+    userList.map { user =>
+      if (user.isEmpty) {
+        false
+      }
+      else if (!BCrypt.checkpw(password, user.head.password)) {
+        false
+      }
+      else {
+        true
+      }
+    }
+  }
+
+  def getEmail(username: String): Future[String] = {
+    Logger.info("Sending data for maintaining session for user")
+    val userList: Future[List[User]] = db.run(userQuery.filter(_.username === username).to[List].result)
+    userList.map(user => user.head.email)
+  }
+
+  def getUser(email: String): Future[List[User]] ={
+    Logger.info("Retrieving user from database from email stored in session")
+    db.run(userQuery.filter(_.email === email).to[List].result)
   }
 
 }
