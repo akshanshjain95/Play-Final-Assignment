@@ -1,11 +1,13 @@
-@(loginForm: Form[Login])(implicit messages: Messages)
+@(loginForm: Form[Login])(implicit messages: Messages, flash: Flash)
 
 @import helper._
 
 @main("Login Form!") {
 
+@flash.get("success").getOrElse(flash.get("error"))
+
 @helper.form(action = routes.LoginController.loginPost){
-@helper.inputText(loginForm("email"), '_showConstraints -> false, '_label -> "Email")
+@helper.inputText(loginForm("email"), '_showConstraints -> false, '_label -> "Email", '_placeholder -> "Test")
 @helper.inputPassword(loginForm("password"), '_showConstraints -> false, '_label -> "Password")
 <button type="submit">Login</button>
 }

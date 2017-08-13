@@ -14,7 +14,8 @@ class LoginController @Inject()(userRepository: UserRepository, allForms: AllFor
   implicit val messages: MessagesApi = messagesApi
 
   def login: Action[AnyContent] = Action { implicit request: Request[AnyContent] =>
-    Ok(views.html.login(allForms.loginForm))
+    val email = request.flash.get("email").getOrElse("")
+    Ok(views.html.login(allForms.loginForm.fill(Login(email, ""))))
   }
 
   def loginPost: Action[AnyContent] = Action.async { implicit request: Request[AnyContent] =>
@@ -33,7 +34,7 @@ class LoginController @Inject()(userRepository: UserRepository, allForms: AllFor
                 Redirect(routes.UpdateProfileController.showProfile).withSession("userID" -> s"${id.head}")
             }
           }
-          case false => Future.successful(Redirect(routes.LoginController.login))
+          case false => Future.successful(Redirect(routes.LoginController.login).flashing("error" -> "Username and password combination did not match!", "email" -> s"${userData.email}"))
         }
       })
   }

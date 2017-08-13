@@ -56,7 +56,11 @@ class UserHobbyRepository @Inject()(protected val dbConfigProvider: DatabaseConf
     val emailHobbySeq: Future[Seq[(Int, String)]] = db.run(emailHobbyJoin.result)
 
     emailHobbySeq.map(emailHobby => emailHobby.filter(_._1 == userID).map(_._2).toList)
+  }
 
+  def deleteUserHobby(userID: Int): Future[Boolean] = {
+    Logger.info("Deleting user hobbies for given user ID")
+    db.run(userHobbyQuery.filter(_.userID === userID).delete) map (_>0)
   }
 
 }

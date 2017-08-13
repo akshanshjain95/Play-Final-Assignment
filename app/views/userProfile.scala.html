@@ -4,9 +4,17 @@
 
 @main("SignUp information"){
 
+@if(updateUserForm.hasGlobalErrors) {
+<ul>
+    @for(error <- updateUserForm.globalErrors) {
+    <li>@Messages(error.messages, error.args)</li>
+    }
+</ul>
+}
+
 <h1>With the following data, you have successfully signed up - </h1>
 
-@form(action = routes.SignUpController.signUpPost) {
+@form(action = routes.UpdateProfileController.showProfilePost) {
 @helper.inputText(updateUserForm("name.firstName"), '_showConstraints -> false, '_label -> "First Name")
 @helper.inputText(updateUserForm("name.middleName"), '_showConstraints -> false, '_label -> "Middle Name")
 @helper.inputText(updateUserForm("name.lastName"), '_showConstraints -> false, '_label -> "Last Name")
@@ -19,7 +27,7 @@ updateUserForm("hobbies"),
 options = hobbyList.map(hobby => hobby -> hobby),
 '_label -> "Hobbies",
 '_error -> updateUserForm("hobbies").error.map(_.withMessage("Select atleast one hobby!")))
-<button type="submit">SignUp</button>
+<button type="submit">Update</button>
 }
 
 }

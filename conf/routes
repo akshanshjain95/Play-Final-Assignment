@@ -11,6 +11,7 @@ GET     /login                         controllers.LoginController.login
 GET     /signup                        controllers.SignUpController.signUp
 POST    /signuppost                    controllers.SignUpController.signUpPost
 GET     /showprofile                   controllers.UpdateProfileController.showProfile
+POST    /showprofilepost               controllers.UpdateProfileController.showProfilePost
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file                  controllers.Assets.versioned(path="/public", file: Asset)

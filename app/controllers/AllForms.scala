@@ -54,7 +54,7 @@ class AllForms {
     "email" -> email,
     "gender" -> nonEmptyText,
     "age" -> number(MIN_AGE, MAX_AGE),
-    "hobbies" -> list(text)
+    "hobbies" -> list(text).verifying(nonEmptyList)
   )(UpdateUserForm.apply)(UpdateUserForm.unapply))
 
   def checkPassword: Constraint[String] = {

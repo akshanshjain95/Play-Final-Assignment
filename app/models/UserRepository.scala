@@ -1,12 +1,14 @@
 package models
 
 import com.google.inject.Inject
+import controllers.UpdateUserForm
 import org.mindrot.jbcrypt.BCrypt
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.db.slick.{DatabaseConfigProvider, HasDatabaseConfigProvider}
 import slick.driver.JdbcProfile
 import slick.lifted.ProvenShape
 import play.api.Logger
+
 import scala.concurrent.Future
 
 case class User(id: Int, firstName: String, middleName: Option[String], lastName: String,
@@ -101,6 +103,14 @@ class UserRepository @Inject()(protected val dbConfigProvider: DatabaseConfigPro
   def getUserID(email: String): Future[List[Int]] = {
     Logger.info("Getting user ID based on user E-mail")
     db.run(userQuery.filter(_.email === email).map(_.id).to[List].result)
+  }
+
+  def updateUser(updateUser: UpdateUserForm, id: Int): Future[Boolean] = {
+    Logger.info("Updating user for given user ID")
+    db.run(userQuery.filter(_.id === id).map(user => (user.firstName, user.middleName, user.lastName,
+    user.mobileNo, user.email, user.gender, user.age)).update((updateUser.name.firstName, updateUser.name.middleName,
+      updateUser.name.lastName, updateUser.mobileNo, updateUser.email, updateUser.gender, updateUser.age)))
+      .map(_ > 0)
   }
 
 }
