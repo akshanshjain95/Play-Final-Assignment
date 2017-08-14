@@ -113,4 +113,12 @@ class UserRepository @Inject()(protected val dbConfigProvider: DatabaseConfigPro
       .map(_ > 0)
   }
 
+  def checkEmailForUpdate(email: String, id: Int): Future[Boolean] = {
+    Logger.info("Checking if email exists in database other than for the current user")
+    val emailList = db.run(userQuery.filter(user => user.email === email && user.id =!= id).to[List].result)
+    emailList.map { email =>
+      if (email.isEmpty) true else false
+    }
+  }
+
 }

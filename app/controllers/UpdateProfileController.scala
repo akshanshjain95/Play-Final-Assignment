@@ -60,20 +60,25 @@ class UpdateProfileController @Inject()(userRepository: UserRepository, hobbyRep
           case Some(userID) =>
             val updateUserForm = UpdateUserForm(updateUserData.name, updateUserData.mobileNo,
               updateUserData.email, updateUserData.gender, updateUserData.age, updateUserData.hobbies)
-            userRepository.updateUser(updateUserForm, userID.toInt).flatMap {
+            userRepository.checkEmailForUpdate(updateUserData.email, userID.toInt).flatMap {
               case true =>
-                userHobbyRepository.deleteUserHobby(userID.toInt).flatMap {
+                Logger.info("Email is unique!")
+                userRepository.updateUser(updateUserForm, userID.toInt).flatMap {
                   case true =>
-                    hobbyRepository.getHobbyIDs(updateUserData.hobbies).flatMap {
-                      case Nil => Future.successful(Redirect(routes.UpdateProfileController.showProfile).flashing("error" -> "Something went wrong!"))
-                      case hobbyIDs: List[List[Int]] =>
-                        userHobbyRepository.addUserHobby(userID.toInt, hobbyIDs).map {
-                          case true => Redirect(routes.UpdateProfileController.showProfile).flashing("success" -> "User Profile successfully updated!")
-                          case false => Redirect(routes.UpdateProfileController.showProfile).flashing("error" -> "Something went wrong!")
+                    userHobbyRepository.deleteUserHobby(userID.toInt).flatMap {
+                      case true =>
+                        hobbyRepository.getHobbyIDs(updateUserData.hobbies).flatMap {
+                          case Nil => Future.successful(Redirect(routes.UpdateProfileController.showProfile).flashing("error" -> "Something went wrong!"))
+                          case hobbyIDs: List[List[Int]] =>
+                            userHobbyRepository.addUserHobby(userID.toInt, hobbyIDs).map {
+                              case true => Redirect(routes.UpdateProfileController.showProfile).flashing("success" -> "User Profile successfully updated!")
+                              case false => Redirect(routes.UpdateProfileController.showProfile).flashing("error" -> "Something went wrong!")
+                            }
                         }
+                      case false => Future.successful(Redirect(routes.UpdateProfileController.showProfile).flashing("error" -> "User Profile not updated due to errors!"))
                     }
-                  case false => Future.successful(Redirect(routes.UpdateProfileController.showProfile).flashing("error" -> "User Profile not updated due to errors!"))
                 }
+              case false => Future.successful(Redirect(routes.UpdateProfileController.showProfile).flashing("error" -> "Email already exists!"))
             }
           case None => Future.successful(Ok(views.html.index()))
         }
