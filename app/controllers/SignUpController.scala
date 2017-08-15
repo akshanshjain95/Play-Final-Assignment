@@ -47,7 +47,8 @@ class SignUpController @Inject()(userRepository: UserRepository, hobbyRepository
                           .flashing("error" -> "Something went wrong and we weren't able to retrieve your account's ID."))
                         case id: List[Int] =>
                           userHobbyRepository.addUserHobby(id.head, signUpData.hobbies.map(_.toInt)).map {
-                            case true => Redirect(routes.UpdateProfileController.showProfile).withSession("userID" -> s"${id.head}")
+                            case true => Redirect(routes.UpdateProfileController.showProfile)
+                              .flashing("success" -> "Successfully signed up!").withSession("userID" -> s"${id.head}")
                             case false => Redirect(routes.SignUpController.signUp)
                               .flashing("error" -> "Something went wrong and we weren't able to store your selected hobbies.")
                           }

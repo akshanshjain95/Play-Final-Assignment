@@ -84,17 +84,6 @@ class UserRepository @Inject()(protected val dbConfigProvider: DatabaseConfigPro
     }
   }
 
-  /*def getEmail(username: String): Future[String] = {
-    Logger.info("Sending data for maintaining session for user")
-    val userList: Future[List[User]] = db.run(userQuery.filter(_.username === username).to[List].result)
-    userList.map(user => user.head.email)
-  }*/
-
-  def getUser(email: String): Future[List[User]] ={
-    Logger.info("Retrieving user from database from email stored in session")
-    db.run(userQuery.filter(_.email === email).to[List].result)
-  }
-
   def getUserByID(userID: Int): Future[List[User]] = {
     Logger.info("Retrieving user from database from ID stored in session")
     db.run(userQuery.filter(_.id === userID).to[List].result)
@@ -113,24 +102,18 @@ class UserRepository @Inject()(protected val dbConfigProvider: DatabaseConfigPro
       .map(_ > 0)
   }
 
-  def checkEmailForUpdate(email: String, id: Int): Future[Boolean] = {
-    Logger.info("Checking if email exists in database other than for the current user")
-    val emailList = db.run(userQuery.filter(user => user.email === email && user.id =!= id).to[List].result)
-    emailList.map { email =>
-      if (email.isEmpty) true else false
-    }
-  }
-
   def updateUserByEmail(updatePassword: UpdatePassword): Future[Boolean] = {
     Logger.info("Updating password for given user")
     db.run(userQuery.filter(_.email === updatePassword.email).map(_.password).update(updatePassword.password)) map (_ > 0)
   }
 
   def getAllUsersWithStatus(id: Int): Future[Map[String, Boolean]] = {
+    Logger.info("Getting all users with enable/disable status")
     db.run(userQuery.filter(_.id =!= id).map(user => (user.email, user.isEnabled)).sorted.to[List].result).map(_.toMap)
   }
 
   def enableUser(email: String, status: Boolean): Future[Boolean] = {
+    Logger.info("Enabling/Disabling the given user")
     db.run(userQuery.filter(_.email === email).map(_.isEnabled).update(status)) map (_ > 0)
   }
 

@@ -3,7 +3,7 @@ package controllers
 import akka.stream.Materializer
 import com.typesafe.config.ConfigFactory
 import models.{HobbyRepository, User, UserRepository}
-import org.mockito.ArgumentMatchers
+import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec

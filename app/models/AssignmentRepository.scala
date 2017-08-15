@@ -1,9 +1,11 @@
 package models
 
 import com.google.inject.Inject
+import play.api.Logger
 import play.api.db.slick.{DatabaseConfigProvider, HasDatabaseConfigProvider}
 import slick.driver.JdbcProfile
 import slick.lifted.ProvenShape
+
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
@@ -34,14 +36,17 @@ class AssignmentRepository @Inject()(protected val dbConfigProvider: DatabaseCon
   import driver.api._
 
   def addAssignment(assignment: Assignment): Future[Boolean] = {
+    Logger.info("Adding assignment to database")
     db.run(assignmentQuery += assignment) map (_>0)
   }
 
   def getAllAssignments: Future[List[Assignment]] = {
+    Logger.info("Returning list of all assignments in database")
     db.run(assignmentQuery.to[List].result)
   }
 
   def deleteAssignment(assignmentID: Int): Future[Boolean] = {
+    Logger.info("Deleting the assignemnt corresponding to given assignment ID")
     db.run(assignmentQuery.filter(_.id === assignmentID).delete) map (_>0)
   }
 

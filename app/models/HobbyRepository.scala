@@ -38,9 +38,4 @@ class HobbyRepository @Inject()(protected val dbConfigProvider: DatabaseConfigPr
     db.run(hobbyQuery.to[List].result)
   }
 
-  def getHobbyIDs(hobbies: List[String]): Future[List[List[Int]]] = {
-    Logger.info("Getting the list of IDs of the given hobbies")
-    Future.sequence(hobbies.map(hobby => db.run(hobbyQuery.filter(_.hobby === hobby).map(_.id).to[List].result)))
-  }
-
 }

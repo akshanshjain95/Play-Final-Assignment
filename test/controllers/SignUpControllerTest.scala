@@ -3,7 +3,7 @@ package controllers
 import akka.stream.Materializer
 import com.typesafe.config.ConfigFactory
 import models._
-import org.mockito.ArgumentMatchers
+import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
@@ -23,8 +23,9 @@ class SignUpControllerTest extends PlaySpec with MockitoSugar with GuiceOneAppPe
   val mockUserRepository: UserRepository = mock[UserRepository]
   val allFormsObj: AllForms = new AllForms
   val name: Name = Name("Akshansh", None, "Jain")
+  val hobbyNameList: List[String] = List("Programming", "Sports")
   val hobbies: List[Hobby] = List(Hobby(1, "Programming"), Hobby(2, "Sports"))
-  val user: SignUp = SignUp(name, 9999819877L, "akshansh@knoldus.com", "akshansh123", "akshansh123", "male", 21, hobbies)
+  val user: SignUp = SignUp(name, 9999819877L, "akshansh@knoldus.com", "akshansh123", "akshansh123", "male", 21, hobbyNameList)
   val userForm: Form[SignUp] = allFormsObj.signUpForm
   val mockAllForms: AllForms = mock[AllForms]
   val allForms: AllForms = new AllForms
@@ -40,7 +41,7 @@ class SignUpControllerTest extends PlaySpec with MockitoSugar with GuiceOneAppPe
 
     "show the sign up page" in {
 
-      when(mockHobbyRepository.getHobbies).thenReturn(hobbyList)
+      when(mockHobbyRepository.getHobbies).thenReturn(Future(hobbies))
 
       when(mockAllForms.signUpForm).thenReturn(userForm)
 
@@ -53,9 +54,9 @@ class SignUpControllerTest extends PlaySpec with MockitoSugar with GuiceOneAppPe
 
       when(mockUserRepository.checkEmail("akshansh@knoldus.com")).thenReturn(Future(true))
 
-      when(mockUserRepository.addUser(ArgumentMatchers.any(classOf[User]))).thenReturn(Future(true))
+      when(mockUserRepository.addUser(any(classOf[User]))).thenReturn(Future(true))
 
-      when(mockHobbyRepository.getHobbyIDs(hobbies)).thenReturn(Future(List(List(1,3))))
+      //when(mockHobbyRepository.getHobbyIDs(hobbies)).thenReturn(Future(List(List(1,3))))
 
       when(mockUserRepository.getUserID("akshansh@knoldus.com")).thenReturn(Future(Nil))
 
@@ -64,7 +65,7 @@ class SignUpControllerTest extends PlaySpec with MockitoSugar with GuiceOneAppPe
       val result = call(signUpController.signUpPost,FakeRequest(POST, "/signuppost").withFormUrlEncodedBody(
         "name.firstName" -> "Akshansh", "name.middleName" -> "", "name.lastName" -> "Jain", "mobileNo" -> "9999819877",
         "email" -> "akshansh@knoldus.com", "password" -> "akshansh123", "repassword" -> "akshansh123",
-        "gender" -> "male", "age" -> "21", "hobbies[0]" -> "Programming", "hobbies[1]" -> "Sports")
+        "gender" -> "male", "age" -> "21", "hobbies[0]" -> "1", "hobbies[1]" -> "3")
       )
 
       redirectLocation(result) mustBe Some("/signup")
@@ -74,9 +75,9 @@ class SignUpControllerTest extends PlaySpec with MockitoSugar with GuiceOneAppPe
 
       when(mockUserRepository.checkEmail("akshansh@knoldus.com")).thenReturn(Future(true))
 
-      when(mockUserRepository.addUser(ArgumentMatchers.any(classOf[User]))).thenReturn(Future(true))
+      when(mockUserRepository.addUser(any(classOf[User]))).thenReturn(Future(true))
 
-      when(mockHobbyRepository.getHobbyIDs(hobbies)).thenReturn(Future(List(List(1,3))))
+      //when(mockHobbyRepository.getHobbyIDs(hobbies)).thenReturn(Future(List(List(1,3))))
 
       when(mockUserRepository.getUserID("akshansh@knoldus.com")).thenReturn(Future(List(1)))
 
@@ -87,7 +88,7 @@ class SignUpControllerTest extends PlaySpec with MockitoSugar with GuiceOneAppPe
       val result = call(signUpController.signUpPost,FakeRequest(POST, "/signuppost").withFormUrlEncodedBody(
         "name.firstName" -> "Akshansh", "name.middleName" -> "", "name.lastName" -> "Jain", "mobileNo" -> "9999819877",
         "email" -> "akshansh@knoldus.com", "password" -> "akshansh123", "repassword" -> "akshansh123",
-        "gender" -> "male", "age" -> "21", "hobbies[0]" -> "Programming", "hobbies[1]" -> "Sports")
+        "gender" -> "male", "age" -> "21", "hobbies[0]" -> "1", "hobbies[1]" -> "3")
       )
 
       redirectLocation(result) mustBe Some("/signup")
@@ -97,9 +98,9 @@ class SignUpControllerTest extends PlaySpec with MockitoSugar with GuiceOneAppPe
 
       when(mockUserRepository.checkEmail("akshansh@knoldus.com")).thenReturn(Future(true))
 
-      when(mockUserRepository.addUser(ArgumentMatchers.any(classOf[User]))).thenReturn(Future(true))
+      when(mockUserRepository.addUser(any(classOf[User]))).thenReturn(Future(true))
 
-      when(mockHobbyRepository.getHobbyIDs(hobbies)).thenReturn(Future(List(List(1,3))))
+      //when(mockHobbyRepository.getHobbyIDs(hobbies)).thenReturn(Future(List(List(1,3))))
 
       when(mockUserRepository.getUserID("akshansh@knoldus.com")).thenReturn(Future(List(1)))
 
@@ -110,7 +111,7 @@ class SignUpControllerTest extends PlaySpec with MockitoSugar with GuiceOneAppPe
       val result = call(signUpController.signUpPost,FakeRequest(POST, "/signuppost").withFormUrlEncodedBody(
         "name.firstName" -> "Akshansh", "name.middleName" -> "", "name.lastName" -> "Jain", "mobileNo" -> "9999819877",
         "email" -> "akshansh@knoldus.com", "password" -> "akshansh123", "repassword" -> "akshansh123",
-        "gender" -> "male", "age" -> "21", "hobbies[0]" -> "Programming", "hobbies[1]" -> "Sports")
+        "gender" -> "male", "age" -> "21", "hobbies[0]" -> "1", "hobbies[1]" -> "3")
       )
 
       redirectLocation(result) mustBe Some("/showprofile")
@@ -120,14 +121,14 @@ class SignUpControllerTest extends PlaySpec with MockitoSugar with GuiceOneAppPe
 
       when(mockUserRepository.checkEmail("akshansh@knoldus.com")).thenReturn(Future(true))
 
-      when(mockUserRepository.addUser(ArgumentMatchers.any(classOf[User]))).thenReturn(Future(false))
+      when(mockUserRepository.addUser(any(classOf[User]))).thenReturn(Future(false))
 
       when(mockAllForms.signUpForm).thenReturn(userForm)
 
       val result = call(signUpController.signUpPost,FakeRequest(POST, "/signuppost").withFormUrlEncodedBody(
         "name.firstName" -> "Akshansh", "name.middleName" -> "", "name.lastName" -> "Jain", "mobileNo" -> "9999819877",
         "email" -> "akshansh@knoldus.com", "password" -> "akshansh123", "repassword" -> "akshansh123",
-        "gender" -> "male", "age" -> "21", "hobbies[0]" -> "Programming")
+        "gender" -> "male", "age" -> "21", "hobbies[0]" -> "1")
       )
 
       redirectLocation(result) mustBe Some("/signup")
@@ -142,7 +143,7 @@ class SignUpControllerTest extends PlaySpec with MockitoSugar with GuiceOneAppPe
       val result = call(signUpController.signUpPost, FakeRequest(POST, "/signuppost").withFormUrlEncodedBody(
         "name.firstName" -> "Akshansh", "name.middleName" -> "", "name.lastName" -> "Jain", "mobileNo" -> "9999819877",
         "email" -> "akshansh@knoldus.com", "password" -> "akshansh123", "repassword" -> "akshansh123",
-        "gender" -> "male", "age" -> "21", "hobbies[0]" -> "Programming")
+        "gender" -> "male", "age" -> "21", "hobbies[0]" -> "1")
       )
 
       redirectLocation(result) mustBe Some("/signup")
@@ -152,12 +153,12 @@ class SignUpControllerTest extends PlaySpec with MockitoSugar with GuiceOneAppPe
 
       when(mockAllForms.signUpForm).thenReturn(userForm)
 
-      when(mockHobbyRepository.getHobbies).thenReturn(hobbyList)
+      when(mockHobbyRepository.getHobbies).thenReturn(Future(hobbies))
 
       val result = call(signUpController.signUpPost, FakeRequest(POST, "/signuppost").withFormUrlEncodedBody(
         "name.firstName" -> "Akshansh", "name.middleName" -> "", "name.lastName" -> "Jain", "mobileNo" -> "9999819877",
         "email" -> "akshansh@knoldus.com", "password" -> "akshansh12", "repassword" -> "akshansh123",
-        "gender" -> "male", "age" -> "21", "hobbies[0]" -> "Programming", "hobbies[1]" -> "Sports")
+        "gender" -> "male", "age" -> "21", "hobbies[0]" -> "1", "hobbies[1]" -> "3")
       )
 
       status(result) mustEqual BAD_REQUEST

@@ -36,10 +36,12 @@ class LoginController @Inject()(userRepository: UserRepository, allForms: AllFor
                     .flashing("error" -> "Sorry! You are not enabled and thus cannot login. Please contact the site administrator.")
                 }
                 else if(!listOfUserInfo.head._2) {
-                  Redirect(routes.UpdateProfileController.showProfile).withSession("userID" -> s"${listOfUserInfo.head._1}", "isAdmin" -> "false")
+                  Redirect(routes.UpdateProfileController.showProfile)
+                    .flashing("success" -> "Successfully logged in!").withSession("userID" -> s"${listOfUserInfo.head._1}", "isAdmin" -> "false")
                 }
                 else {
-                  Redirect(routes.UpdateProfileController.showProfile).withSession("userID" -> s"${listOfUserInfo.head._1}", "isAdmin" -> "true")
+                  Redirect(routes.UpdateProfileController.showProfile)
+                    .flashing("success" -> "Successfully logged in!").withSession("userID" -> s"${listOfUserInfo.head._1}", "isAdmin" -> "true")
                 }
             }
           }

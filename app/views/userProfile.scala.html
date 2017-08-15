@@ -1,4 +1,4 @@
-@(updateUserForm: Form[UpdateUserForm], hobbyList: List[Hobby], isAdmin: Option[String])(implicit messages: Messages)
+@(updateUserForm: Form[UpdateUserForm], hobbyList: List[Hobby], isAdmin: Option[String])(implicit messages: Messages, flash: Flash)
 
 @import helper._
 
@@ -9,6 +9,8 @@
 }}
 
 @main("SignUp information"){
+
+@flash.get("error").getOrElse(flash.get("success").getOrElse(""))
 
 @if(updateUserForm.hasGlobalErrors) {
 <ul>

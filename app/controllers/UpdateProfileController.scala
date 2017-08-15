@@ -1,13 +1,11 @@
 package controllers
 
 import javax.inject.Inject
-
 import models._
 import org.mindrot.jbcrypt.BCrypt
 import play.api.Logger
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, Controller}
-
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
@@ -32,14 +30,14 @@ class UpdateProfileController @Inject()(userRepository: UserRepository, hobbyRep
           case Nil =>
             Logger.info("Did not receive any user with given UserID! Redirecting to welcome page!")
             Future.successful(Redirect(routes.LoginController.login())
-              .flashing("error" -> "Did not find any user with the given information. Please login again."))
+              .flashing("error" -> "Did not find any user with the given information. Please login again.").withNewSession)
           case userList: List[User] =>
             val user = userList.head
             userHobbyRepository.getUserHobby(userID).flatMap {
               case Nil =>
                 Logger.info("Did not receive any hobbies for the user!")
                 Future.successful(Redirect(routes.LoginController.login())
-                  .flashing("error" -> "Something went wrong since we did not find any hobbies with the given information. Please login again."))
+                  .flashing("error" -> "Something went wrong since we did not find any hobbies with the given information. Please login again.").withNewSession)
 
               case hobbies: List[Int] =>
                 Logger.info("Recieved list of hobbies")
@@ -50,7 +48,8 @@ class UpdateProfileController @Inject()(userRepository: UserRepository, hobbyRep
                 )
             }
         }
-      case None => Future.successful(Ok(views.html.index()))
+      case None => Future.successful(Redirect(routes.LoginController.login())
+        .flashing("error" -> "Something went wrong while retrieving your UserID. Please login again.").withNewSession)
     }
   }
 
@@ -71,16 +70,18 @@ class UpdateProfileController @Inject()(userRepository: UserRepository, hobbyRep
               case true =>
                 userHobbyRepository.deleteUserHobby(userID.toInt).flatMap {
                   case true =>
-                    userHobbyRepository.addUserHobby(userID.toInt, updateUserData.hobbies.map(_.toInt)).map {
+                    userHobbyRepository.addUserHobby(userID.toInt, updateUserData.hobbies).map {
                       case true => Redirect(routes.UpdateProfileController.showProfile).flashing("success" -> "User Profile successfully updated!")
                       case false => Redirect(routes.UpdateProfileController.showProfile).flashing("error" -> "Something went wrong!")
                     }
                   case false => Future.successful(Redirect(routes.UpdateProfileController.showProfile)
                     .flashing("error" -> "User Profile not updated due to errors!"))
                 }
-              case false => Future.successful(Redirect(routes.UpdateProfileController.showProfile).flashing("error" -> "Email already exists!"))
+              case false => Future.successful(Redirect(routes.UpdateProfileController.showProfile)
+                .flashing("error" -> "Something went wrong. Please update your profile again."))
             }
-          case None => Future.successful(Ok(views.html.index()))
+          case None => Future.successful(Redirect(routes.LoginController.login())
+            .flashing("error" -> "Something went wrong while retrieving your ID. Please login again!").withNewSession)
         }
       }
     )
@@ -102,11 +103,12 @@ class UpdateProfileController @Inject()(userRepository: UserRepository, hobbyRep
         val updatePasswordForm = UpdatePassword(updatePasswordData.email, password, password)
         userRepository.updateUserByEmail(updatePasswordForm).map {
           case true =>
-            Redirect(routes.LoginController.login()).flashing("success" -> "Password successfully updated!")
+            Redirect(routes.LoginController.login()).flashing("success" -> "Password successfully updated!").withNewSession
           case false =>
             Redirect(routes.UpdateProfileController.updatePassword()).
               flashing("error" ->
-                "The email entered was either invalid or is not registered with us. Kindly consider registering first if this is your first time visiting the site.")
+                "The email entered was either invalid or is not registered with us. Kindly consider registering if this is your first time visiting the site."
+              )
         }
       }
     )

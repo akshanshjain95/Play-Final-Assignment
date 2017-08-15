@@ -1,7 +1,3 @@
-val list = List(1,2,3,4,5)
+import org.mindrot.jbcrypt.BCrypt
 
-val y = for{
-  l <- list
-} yield l -> l
-
-list.map(l => l -> l)
+BCrypt.hashpw("akshansh123", BCrypt.gensalt())
