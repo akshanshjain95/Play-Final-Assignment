@@ -2,6 +2,7 @@ import javax.inject.Singleton
 import play.api.http.HttpErrorHandler
 import play.api.mvc.Results._
 import play.api.mvc.{RequestHeader, Result}
+
 import scala.concurrent.Future
 
 @Singleton
