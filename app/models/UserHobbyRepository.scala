@@ -35,25 +35,29 @@ class UserHobbyRepository @Inject()(protected val dbConfigProvider: DatabaseConf
 
   import driver.api._
 
-  def addUserHobby(userID: Int, hobbies: List[List[Int]]): Future[Boolean] = {
+  def addUserHobby(userID: Int, hobbies: List[Int]): Future[Boolean] = {
     Logger.info("Adding hobbies for given user")
-    val listOfValidHobbies = hobbies.filter(_ != Nil)
-    val listOfResult: List[Future[Boolean]] = listOfValidHobbies.map (
-      hobbyID => db.run(userHobbyQuery += UserToHobby(0, userID, hobbyID.head)).map(_ > 0)
+    if (hobbies.isEmpty) {
+      Future(false)
+    }
+    else {
+      val listOfResult: List[Future[Boolean]] = hobbies.map(
+        hobbyID => db.run(userHobbyQuery += UserToHobby(0, userID, hobbyID)).map(_ > 0)
       )
-    Future.sequence(listOfResult).map {
-      result =>
-        if (result.contains(false)) false else true
+      Future.sequence(listOfResult).map {
+        result =>
+          if (result.contains(false)) false else true
+      }
     }
   }
 
-  def getUserHobby(userID: Int): Future[Seq[String]] = {
+  def getUserHobby(userID: Int): Future[List[Int]] = {
     Logger.info("Retrieving user hobbies using user email")
-    val emailHobbyJoin: QueryBase[Seq[(Int, String)]] = for{
-      (user,hobbyName) <- userHobbyQuery join hobbyQuery on (_.hobbyID === _.id)
-    } yield (user.userID, hobbyName.hobby)
+    val emailHobbyJoin: QueryBase[Seq[(Int, Int)]] = for{
+      (user,hobby) <- userHobbyQuery join hobbyQuery on (_.hobbyID === _.id)
+    } yield (user.userID, hobby.id)
 
-    val emailHobbySeq: Future[Seq[(Int, String)]] = db.run(emailHobbyJoin.result)
+    val emailHobbySeq: Future[Seq[(Int, Int)]] = db.run(emailHobbyJoin.result)
 
     emailHobbySeq.map(emailHobby => emailHobby.filter(_._1 == userID).map(_._2).toList)
   }

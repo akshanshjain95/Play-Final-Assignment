@@ -12,8 +12,12 @@ case class SignUp(name: Name, mobileNo: Long, email: String, password: String,
 
 case class Name(firstName: String, middleName: Option[String], lastName: String)
 
-case class UpdateUserForm(name: Name, mobileNo: Long, email: String,
-                          gender: String, age: Int, hobbies: List[String])
+case class UpdateUserForm(name: Name, mobileNo: Long,
+                          gender: String, age: Int, hobbies: List[Int])
+
+case class UpdatePassword(email: String, password: String, repassword: String)
+
+case class AddAssignment(title: String, description: String)
 
 class AllForms {
 
@@ -51,11 +55,25 @@ class AllForms {
       "lastName" -> nonEmptyText.verifying(checkName)
     )(Name.apply)(Name.unapply),
     "mobileNo" -> longNumber.verifying(numberOfDigits),
-    "email" -> email,
     "gender" -> nonEmptyText,
     "age" -> number(MIN_AGE, MAX_AGE),
-    "hobbies" -> list(text).verifying(nonEmptyList)
+    "hobbies" -> list(number).verifying(nonEmptyListOfID)
   )(UpdateUserForm.apply)(UpdateUserForm.unapply))
+
+  val updatePasswordForm = Form(mapping(
+    "email" -> email,
+    "password" -> nonEmptyText.verifying(checkPassword),
+    "repassword" -> nonEmptyText.verifying(checkPassword)
+  )(UpdatePassword.apply)(UpdatePassword.unapply)
+    .verifying(
+      "The passwords did not match!",
+      updatePassword => updatePassword.password == updatePassword.repassword
+    ))
+
+  val addAssignmentForm = Form(mapping(
+    "title" -> nonEmptyText,
+    "description" -> nonEmptyText
+  )(AddAssignment.apply)(AddAssignment.unapply))
 
   def checkPassword: Constraint[String] = {
     Constraint("checkPassword.constraint")(
@@ -106,6 +124,15 @@ class AllForms {
   }
 
   def nonEmptyList: Constraint[List[String]] = {
+    Constraint("checkList.constraint")(
+      {
+        hobbies =>
+          if(hobbies.isEmpty) Invalid(ValidationError("Select atleast one hobby!")) else Valid
+      }
+    )
+  }
+
+  def nonEmptyListOfID: Constraint[List[Int]] = {
     Constraint("checkList.constraint")(
       {
         hobbies =>

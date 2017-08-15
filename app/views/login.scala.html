@@ -4,11 +4,13 @@
 
 @main("Login Form!") {
 
-@flash.get("success").getOrElse(flash.get("error"))
+@flash.get("success").getOrElse(flash.get("error").getOrElse(""))
 
 @helper.form(action = routes.LoginController.loginPost){
 @helper.inputText(loginForm("email"), '_showConstraints -> false, '_label -> "Email", '_placeholder -> "Test")
 @helper.inputPassword(loginForm("password"), '_showConstraints -> false, '_label -> "Password")
 <button type="submit">Login</button>
 }
+
+<a href="@routes.UpdateProfileController.updatePassword">Forgot Password</a>
 }

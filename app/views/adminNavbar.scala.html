@@ -1,0 +1,35 @@
+@(activeNav: String)
+
+<nav class="navbar navbar-default">
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <a class="navbar-brand" href="#">Knoldus</a>
+        </div>
+        <ul class="nav navbar-nav">
+            @if(activeNav == "Profile") {
+            <li class="active"><a href="@routes.UpdateProfileController.showProfile">Profile</a></li>
+            <li><a href="@routes.AssignmentController.showAssignments">View Assignment</a></li>
+            <li><a href="@routes.AssignmentController.addAssignment">Add Assignment</a></li>
+            <li><a href="@routes.EnableDisableController.showUserList">View Users</a></li>
+            } else { @if(activeNav == "View Assignment") {
+            <li><a href="@routes.UpdateProfileController.showProfile">Profile</a></li>
+            <li class="active"><a href="@routes.AssignmentController.showAssignments">View Assignment</a></li>
+            <li><a href="@routes.AssignmentController.addAssignment">Add Assignment</a></li>
+            <li><a href="@routes.EnableDisableController.showUserList">View Users</a></li>
+            } else { @if(activeNav == "Add Assignment") {
+            <li><a href="@routes.UpdateProfileController.showProfile">Profile</a></li>
+            <li><a href="@routes.AssignmentController.showAssignments">View Assignment</a></li>
+            <li class="active"><a href="@routes.AssignmentController.addAssignment">Add Assignment</a></li>
+            <li><a href="@routes.EnableDisableController.showUserList">View Users</a></li>
+            } else {
+            <li><a href="@routes.UpdateProfileController.showProfile">Profile</a></li>
+            <li><a href="@routes.AssignmentController.showAssignments">View Assignment</a></li>
+            <li><a href="@routes.AssignmentController.addAssignment">Add Assignment</a></li>
+            <li class="active"><a href="@routes.EnableDisableController.showUserList">View Users</a></li>
+            }}}
+        </ul>
+        <ul class="nav navbar-nav navbar-right">
+            <li><a href="@routes.LoginController.logout"><span class="glyphicon glyphicon-log-out"></span> Logout</a></li>
+        </ul>
+    </div>
+</nav>

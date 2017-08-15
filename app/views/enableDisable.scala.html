@@ -1,0 +1,29 @@
+@(emailListWithStatus: Map[String, Boolean])(implicit messages: Messages, flash: Flash)
+
+@import helper._
+
+@adminNavbar("View User")
+
+@main("Showing All user emails") {
+
+@flash.get("success").getOrElse(flash.get("error").getOrElse(""))
+
+@if(emailListWithStatus.isEmpty) {
+<h1>List of users is currently empty.</h1>
+} else {
+
+@for((email, status) <- emailListWithStatus) {
+
+@form(action = routes.EnableDisableController.enableDisablePost(email)) {
+@email
+@if(status) {
+<button disabled type="submit" value="enable" name="ableButton">Enable</button>
+<button type="submit" value="disable" name="ableButton">Disable</button>
+} else {
+<button type="submit" value="enable" name="ableButton">Enable</button>
+<button disabled type="submit" value="disable" name="ableButton">Disable</button>
+}
+}
+}
+}
+}

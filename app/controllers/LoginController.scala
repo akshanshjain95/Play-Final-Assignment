@@ -28,15 +28,29 @@ class LoginController @Inject()(userRepository: UserRepository, allForms: AllFor
         userRepository.checkIfUserExists(userData.email, userData.password).flatMap {
           case true => {
             Logger.info("User exists!")
-            userRepository.getUserID(userData.email).map {
-              case Nil => Ok(views.html.index())
-              case id: List[Int] =>
-                Redirect(routes.UpdateProfileController.showProfile).withSession("userID" -> s"${id.head}")
+            userRepository.getUserInfoForSession(userData.email).map {
+              case Nil => Redirect(routes.LoginController.login()).flashing("error" -> "Something went wrong!")
+              case listOfUserInfo: List[(Int, Boolean, Boolean)] =>
+                if(!listOfUserInfo.head._3) {
+                  Redirect(routes.LoginController.login())
+                    .flashing("error" -> "Sorry! You are not enabled and thus cannot login. Please contact the site administrator.")
+                }
+                else if(!listOfUserInfo.head._2) {
+                  Redirect(routes.UpdateProfileController.showProfile).withSession("userID" -> s"${listOfUserInfo.head._1}", "isAdmin" -> "false")
+                }
+                else {
+                  Redirect(routes.UpdateProfileController.showProfile).withSession("userID" -> s"${listOfUserInfo.head._1}", "isAdmin" -> "true")
+                }
             }
           }
-          case false => Future.successful(Redirect(routes.LoginController.login).flashing("error" -> "Username and password combination did not match!", "email" -> s"${userData.email}"))
+          case false => Future.successful(Redirect(routes.LoginController.login)
+            .flashing("error" -> "Username and password combination did not match!", "email" -> s"${userData.email}"))
         }
       })
+  }
+
+  def logout: Action[AnyContent] = Action {
+    Redirect(routes.HomeController.index()).withNewSession
   }
 
 }

@@ -1,0 +1,30 @@
+@(assignmentForm: Form[AddAssignment], assignments: List[Assignment], isAdmin: Option[String])(implicit messages: Messages)
+
+@import helper._
+
+@if(isAdmin == Some("true")) {
+@adminNavbar("Add Assignment")
+} else { @if(isAdmin == Some("false") || isAdmin == None) {
+@userNavbar("Add Assignment")
+}}
+
+@main("Add Assignments") {
+
+@if(assignments.isEmpty) {
+<h1>No Assignments are currently there.</h1>
+} else {
+
+@for(assignment <- assignments) {
+@form(action = routes.AssignmentController.deleteAssignment(assignment.id)) {
+@assignment.title, @assignment.description <button type="submit">Delete</button>
+}
+}
+}
+
+@form(action = routes.AssignmentController.addAssignmentPost) {
+@inputText(assignmentForm("title"), '_showConstraints -> false, '_label -> "Assignment Title")
+@inputText(assignmentForm("description"), '_showConstraints -> false, '_label -> "Assignment Description")
+<button type="submit">Add Assignment</button>
+}
+
+}

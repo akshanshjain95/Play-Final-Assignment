@@ -26,6 +26,13 @@ hobby_id INT NOT NULL,
 PRIMARY KEY(id)
 );
 
+CREATE TABLE IF NOT EXISTS assignment (
+id serial NOT NULL,
+title VARCHAR(30) NOT NULL,
+description VARCHAR(100) NOT NULL,
+PRIMARY KEY(id)
+);
+
 INSERT INTO hobbytable VALUES
 (1, 'Programming'),
 (2, 'Reading'),

@@ -17,7 +17,7 @@ class SignUpController @Inject()(userRepository: UserRepository, hobbyRepository
 
   implicit val messages: MessagesApi = messagesApi
   val signUpForm: Form[SignUp] = allForms.signUpForm
-  lazy val hobbiesList: Future[List[String]] = hobbyRepository.getHobbies
+  lazy val hobbiesList: Future[List[Hobby]] = hobbyRepository.getHobbies
 
   def signUp: Action[AnyContent] = Action.async { implicit request: Request[AnyContent] =>
     hobbiesList.map(hobbies => Ok(views.html.signUp(allForms.signUpForm, hobbies)))
@@ -42,21 +42,21 @@ class SignUpController @Inject()(userRepository: UserRepository, hobbyRepository
                 Logger.info("userData = " + userData)
                 userRepository.addUser(userData).flatMap {
                   case true =>
-                    val hobbyIDs: Future[List[List[Int]]] = hobbyRepository.getHobbyIDs(signUpData.hobbies)
-                    hobbyIDs.flatMap(
-                      listOfHobbyIds =>
                       userRepository.getUserID(userData.email).flatMap {
-                        case Nil => Future.successful(Redirect(routes.SignUpController.signUp))
+                        case Nil => Future.successful(Redirect(routes.SignUpController.signUp)
+                          .flashing("error" -> "Something went wrong and we weren't able to retrieve your account's ID."))
                         case id: List[Int] =>
-                          userHobbyRepository.addUserHobby(id.head, listOfHobbyIds).map {
+                          userHobbyRepository.addUserHobby(id.head, signUpData.hobbies.map(_.toInt)).map {
                             case true => Redirect(routes.UpdateProfileController.showProfile).withSession("userID" -> s"${id.head}")
                             case false => Redirect(routes.SignUpController.signUp)
+                              .flashing("error" -> "Something went wrong and we weren't able to store your selected hobbies.")
                           }
                       }
-                    )
-                  case false => Future.successful(Redirect(routes.SignUpController.signUp))
+                  case false => Future.successful(Redirect(routes.SignUpController.signUp)
+                    .flashing("error" -> "Something went wrong and we weren't able to store your information. Please sign up again."))
                 }
-          case false => Future.successful(Redirect(routes.SignUpController.signUp))
+          case false => Future.successful(Redirect(routes.SignUpController.signUp)
+            .flashing("error" -> "Entered email already exists. If you're an existing member then please sign in!"))
             }
         }
     )

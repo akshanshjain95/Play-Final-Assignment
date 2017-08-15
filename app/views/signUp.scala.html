@@ -1,4 +1,4 @@
-@(userForm: Form[SignUp], hobbyList: List[String])(implicit messages: Messages)
+@(userForm: Form[SignUp], hobbyList: List[Hobby])(implicit messages: Messages)
 
 
 @import helper._
@@ -25,7 +25,7 @@
 @helper.inputText(userForm("age"), '_showConstraints -> false, '_label -> "Age")
 @inputCheckboxGroup(
 userForm("hobbies"),
-options = hobbyList.map(hobby => hobby -> hobby),
+options = hobbyList.map(hobby => hobby.id.toString -> hobby.hobby),
 '_label -> "Hobbies",
 '_error -> userForm("hobbies").error.map(_.withMessage("Select atleast one hobby!")))
 <button type="submit">SignUp</button>

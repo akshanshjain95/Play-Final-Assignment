@@ -7,6 +7,8 @@ lazy val root = (project in file(".")).enablePlugins(PlayScala)
 
 scalaVersion := "2.11.8"
 
+javaOptions in Test += "-Dconfig.file=conf/test.conf"
+
 //libraryDependencies += guice
 libraryDependencies += "org.scalatestplus.play" %% "scalatestplus-play" % "2.0.0" % "test"
 
@@ -22,9 +24,11 @@ libraryDependencies += "org.mockito" % "mockito-core" % "2.8.47" % "test"
 
 libraryDependencies += "com.h2database" % "h2" % "1.4.188"
 
+libraryDependencies += specs2 % Test
+
 libraryDependencies += evolutions
 
-javaOptions in Test += "-Dconfig.file=conf/test.conf"
+
 
 // Adds additional packages into Twirl
 //TwirlKeys.templateImports += "com.example.controllers._"

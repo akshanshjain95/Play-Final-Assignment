@@ -33,9 +33,9 @@ class HobbyRepository @Inject()(protected val dbConfigProvider: DatabaseConfigPr
 
   import driver.api._
 
-  def getHobbies: Future[List[String]] = {
+  def getHobbies: Future[List[Hobby]] = {
     Logger.info("Getting the list of all the hobbies in the Database")
-    db.run(hobbyQuery.map(_.hobby).to[List].result)
+    db.run(hobbyQuery.to[List].result)
   }
 
   def getHobbyIDs(hobbies: List[String]): Future[List[List[Int]]] = {

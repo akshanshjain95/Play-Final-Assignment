@@ -1,0 +1,19 @@
+@(assignments: List[Assignment], isAdmin: Option[String])(implicit messages: Messages)
+
+@if(isAdmin == Some("true")) {
+@adminNavbar("View Assignment")
+} else { @if(isAdmin == Some("false") || isAdmin == None) {
+@userNavbar("View Assignment")
+}}
+
+@main("Assignments") {
+
+@if(assignments.isEmpty) {
+<h1>No Assignments are currently there.</h1>
+} else {
+
+@for(assignment <- assignments) {
+@assignment.title, @assignment.description
+}
+}
+}

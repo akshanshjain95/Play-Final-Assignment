@@ -1,6 +1,12 @@
-@(updateUserForm: Form[UpdateUserForm], hobbyList: List[String])(implicit messages: Messages)
+@(updateUserForm: Form[UpdateUserForm], hobbyList: List[Hobby], isAdmin: Option[String])(implicit messages: Messages)
 
 @import helper._
+
+@if(isAdmin == Some("true")) {
+@adminNavbar("Profile")
+} else { @if(isAdmin == Some("false") || isAdmin == None) {
+@userNavbar("Profile")
+}}
 
 @main("SignUp information"){
 
@@ -12,19 +18,16 @@
 </ul>
 }
 
-<h1>With the following data, you have successfully signed up - </h1>
-
 @form(action = routes.UpdateProfileController.showProfilePost) {
 @helper.inputText(updateUserForm("name.firstName"), '_showConstraints -> false, '_label -> "First Name")
 @helper.inputText(updateUserForm("name.middleName"), '_showConstraints -> false, '_label -> "Middle Name")
 @helper.inputText(updateUserForm("name.lastName"), '_showConstraints -> false, '_label -> "Last Name")
 @helper.inputText(updateUserForm("mobileNo"), '_showConstraints -> false, '_label -> "Mobile Number")
-@helper.inputText(updateUserForm("email"), '_showConstraints -> false, '_label -> "E-Mail")
 @helper.select(updateUserForm("gender"), options(List("Male", "Female")), '_showConstraints -> false, '_label -> "Gender")
 @helper.inputText(updateUserForm("age"), '_showConstraints -> false, '_label -> "Age")
 @inputCheckboxGroup(
 updateUserForm("hobbies"),
-options = hobbyList.map(hobby => hobby -> hobby),
+options = hobbyList.map(hobby => hobby.id.toString -> hobby.hobby),
 '_label -> "Hobbies",
 '_error -> updateUserForm("hobbies").error.map(_.withMessage("Select atleast one hobby!")))
 <button type="submit">Update</button>
