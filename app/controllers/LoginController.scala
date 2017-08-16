@@ -5,7 +5,6 @@ import models.UserRepository
 import play.api.Logger
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{AnyContent, Controller, _}
-
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 

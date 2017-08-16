@@ -2,19 +2,16 @@ package controllers
 
 import akka.stream.Materializer
 import com.typesafe.config.ConfigFactory
-import models.{HobbyRepository, User, UserRepository}
-import org.mockito.Matchers._
+import models.UserRepository
 import org.mockito.Mockito._
 import org.scalatest.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
-import play.api.{Configuration, Environment}
 import play.api.data.Form
 import play.api.i18n.{DefaultLangs, DefaultMessagesApi, MessagesApi}
-import play.api.mvc.{Action, EssentialAction, Results}
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
-
+import play.api.{Configuration, Environment}
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 

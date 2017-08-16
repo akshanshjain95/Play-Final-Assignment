@@ -3,18 +3,17 @@ package controllers
 import akka.stream.Materializer
 import com.typesafe.config.ConfigFactory
 import models.{Assignment, AssignmentRepository}
-import org.scalatest.FunSuite
+import org.mockito.Matchers._
+import org.mockito.Mockito._
 import org.scalatest.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
-import play.api.{Configuration, Environment}
 import play.api.i18n.{DefaultLangs, DefaultMessagesApi}
-import org.mockito.Mockito._
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
+import play.api.{Configuration, Environment}
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
-import org.mockito.Matchers._
 
 class AssignmentControllerTest extends PlaySpec with MockitoSugar with GuiceOneAppPerSuite {
 

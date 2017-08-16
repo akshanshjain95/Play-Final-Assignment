@@ -1,7 +1,6 @@
 package views
 
 import controllers.AllForms
-import models.Assignment
 import org.scalatest.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import play.api.i18n.Messages

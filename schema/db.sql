@@ -39,3 +39,10 @@ INSERT INTO hobbytable VALUES
 (3, 'Sports'),
 (4, 'Writing'),
 (5, 'Swimming');
+
+INSERT INTO assignment VALUES
+(1, 'Assignemnt1', 'Description1'),
+(2, 'Assignemnt2', 'Description2'),
+(3, 'Assignemnt3', 'Description3'),
+(4, 'Assignemnt4', 'Description4'),
+(5, 'Assignemnt5', 'Description5');

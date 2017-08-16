@@ -1,6 +1,6 @@
 package models
 
-import controllers.{AllForms, Name, UpdatePassword, UpdateUserForm}
+import controllers.{Name, UpdatePassword, UpdateUserForm}
 import org.scalatestplus.play.PlaySpec
 
 class UserRepositoryTest extends PlaySpec {

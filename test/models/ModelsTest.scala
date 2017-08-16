@@ -3,7 +3,6 @@ package models
 import scala.concurrent.duration._
 import play.api.Application
 import play.api.test.WithApplicationLoader
-
 import scala.concurrent.{Await, Future}
 import scala.reflect.ClassTag
 
